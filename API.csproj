@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.17.1" />
+    <PackageReference Include="IPE.SmsIr" Version="1.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.24" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="8.0.28" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="Stimulsoft.Reports.Blazor" Version="2023.1.1" />
+    <PackageReference Include="Stimulsoft.Reports.Engine.Blazor" Version="2023.1.1" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.9" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.9" />
+    <PackageReference Include="System.Text.Json" Version="9.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="BLL\FormSetting\" />
+    <Folder Include="BLL\Page\" />
+  </ItemGroup>
+
+</Project>

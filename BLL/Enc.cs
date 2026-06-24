@@ -1,0 +1,325 @@
+﻿using System.Data;
+using APP;
+using BLL.Models;
+using DAL;
+using Microsoft.Data.SqlClient;
+
+namespace BLL;
+
+public class Enc
+{
+    private readonly ConvertDRowToModel _appConvertDRowToModel = new();
+    private readonly ConvertDtToList _appConvertDtToList = new();
+
+    public List<Models.Enc> PatientList(Models.Enc enc)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@CRUD", enc.CRUD);
+        com.Parameters.AddWithValue("@NationalCode", enc.NationalCode);
+        com.Parameters.AddWithValue("@FirstName", enc.FirstName);
+        com.Parameters.AddWithValue("@LastName", enc.LastName);
+        com.Parameters.AddWithValue("@FatherName", enc.FatherName);
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableBySP(CSet.cnStringHIS, com, "spPatient");
+        return _appConvertDtToList.ConvertDataTable<Models.Enc>(dt);
+    }
+
+    public Models.Enc PatientCRUD(Models.Enc enc, int UserPersID)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@CRUD", enc.CRUD);
+        com.Parameters.AddWithValue("@PatientID", enc.PatientID);
+        com.Parameters.AddWithValue("@NationalCode", enc.NationalCode);
+        com.Parameters.AddWithValue("@FirstName", enc.FirstName);
+        com.Parameters.AddWithValue("@LastName", enc.LastName);
+        com.Parameters.AddWithValue("@FatherName", enc.FatherName);
+
+        com.Parameters.AddWithValue("@Gender", enc.Gender);
+        com.Parameters.AddWithValue("@BirthDate", enc.BirthDate);
+        com.Parameters.AddWithValue("@MaritalStatus", enc.MaritalStatus);
+        com.Parameters.AddWithValue("@Country", enc.Country);
+
+        com.Parameters.AddWithValue("@IDCardNumber", enc.IDCardNumber);
+        com.Parameters.AddWithValue("@BirthArea", enc.BirthArea);
+        com.Parameters.AddWithValue("@Religion", enc.Religion);
+        com.Parameters.AddWithValue("@Job", enc.Job);
+        com.Parameters.AddWithValue("@PassportID", enc.PassportID);
+        com.Parameters.AddWithValue("@EducationLevel", enc.EducationLevel);
+
+        com.Parameters.AddWithValue("@UserPersID", UserPersID);
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableBySP(CSet.cnStringHIS, com, "spPatient");
+
+        DataRow dRow = null;
+        if (dt.Rows.Count > 0)
+            dRow = dt.Rows[0];
+
+
+        return _appConvertDRowToModel.CreateItemFromRow<Models.Enc>(dRow);
+    }
+
+    public Models.Enc EncCRUD(Models.Enc enc, int UserPersID)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@CRUD", enc.CRUD);
+        com.Parameters.AddWithValue("@FuncType", enc.FuncType);
+
+        com.Parameters.AddWithValue("@NationalCode", enc.NationalCode);
+        com.Parameters.AddWithValue("@FirstName", enc.FirstName);
+        com.Parameters.AddWithValue("@LastName", enc.LastName);
+        com.Parameters.AddWithValue("@FatherName", enc.FatherName);
+        com.Parameters.AddWithValue("@EncID", enc.EncID);
+        com.Parameters.AddWithValue("@PatientID", enc.PatientID);
+        com.Parameters.AddWithValue("@StartDate", enc.StartDate);
+        com.Parameters.AddWithValue("@EncType", enc.EncType);
+        com.Parameters.AddWithValue("@IsEmerg", enc.IsEmerg);
+        com.Parameters.AddWithValue("@ModID", enc.ModID);
+        com.Parameters.AddWithValue("@DepID", enc.DepID);
+        com.Parameters.AddWithValue("@DrID", enc.DrID);
+        com.Parameters.AddWithValue("@RefDrID", enc.RefDrID);
+        com.Parameters.AddWithValue("@ReferDrText", enc.ReferDrText);
+        com.Parameters.AddWithValue("@RefPrID", enc.RefPrID);
+        com.Parameters.AddWithValue("@PresDate", enc.PresDate == null ? DBNull.Value : enc.PresDate);
+        com.Parameters.AddWithValue("@EncService", enc.EncService);
+        com.Parameters.AddWithValue("@DiscountPercent", enc.DiscountPercent);
+        com.Parameters.AddWithValue("@ChiefComplaint", enc.ChiefComplaint);
+        com.Parameters.AddWithValue("@UnderlyingDisease", enc.UnderlyingDisease);
+        com.Parameters.AddWithValue("@Description", enc.Description);
+        com.Parameters.AddWithValue("@Insurance", enc.Insurance);
+        com.Parameters.AddWithValue("@InsuranceNumber", enc.InsuranceNumber);
+        com.Parameters.AddWithValue("@InsuranceSerial", enc.InsuranceSerial);
+        com.Parameters.AddWithValue("@InsurancePagenumber", enc.InsurancePageNumber);
+        com.Parameters.AddWithValue("@InsuranceExpireDate", enc.InsuranceExpireDate);
+        com.Parameters.AddWithValue("@InsuranceExpireValid", enc.InsuranceExpireValid);
+        com.Parameters.AddWithValue("@SDrFixAmount", enc.SDrFixAmount);
+        com.Parameters.AddWithValue("@IsSDrAcceptAmount", enc.IsSDrAcceptAmount);
+        com.Parameters.AddWithValue("@OprReserveDate",
+            enc.OprReserveDate == null ? DBNull.Value : enc.OprReserveDate);
+        com.Parameters.AddWithValue("@Height", enc.Height);
+        com.Parameters.AddWithValue("@Weight", enc.Weight);
+
+        com.Parameters.AddWithValue("@Mobile", enc.Mobile);
+        com.Parameters.AddWithValue("@City", enc.City);
+        com.Parameters.AddWithValue("@Street", enc.Street);
+        com.Parameters.AddWithValue("@Email", enc.Email);
+        com.Parameters.AddWithValue("@Tel", enc.Tel);
+
+        com.Parameters.AddWithValue("@CompanionFullName", enc.CompanionFullName);
+        com.Parameters.AddWithValue("@CompanionTel", enc.CompanionTel);
+        com.Parameters.AddWithValue("@Recommender", enc.Recommender);
+        com.Parameters.AddWithValue("@CompanionAddress", enc.CompanionAddress);
+
+        com.Parameters.AddWithValue("@Insurance2", enc.Insurance2);
+        com.Parameters.AddWithValue("@InsuranceNumber2", enc.InsuranceNumber2);
+
+        com.Parameters.AddWithValue("@UserPersID", UserPersID);
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableBySP(CSet.cnStringHIS, com, "spEnc");
+
+        DataRow dRow = null;
+        if (dt.Rows.Count > 0)
+            dRow = dt.Rows[0];
+
+        return _appConvertDRowToModel.CreateItemFromRow<Models.Enc>(dRow);
+    }
+
+    public Models.Enc EncCRUD(Models.Enc enc)
+    {
+        return EncCRUD(enc, 0);
+    }
+
+    public DataTable EncInsuranceChange
+        (int EncID, int InsuranceID, int UserPersID)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@EncID", EncID);
+        com.Parameters.AddWithValue("@InsuranceIDNew", InsuranceID);
+        com.Parameters.AddWithValue("@UserPersID", UserPersID);
+
+        var dalData = new DataService();
+        return dalData.GetDataTableBySP(CSet.cnStringHIS, com, "spEncInsuranceChange");
+    }
+
+    public int EncTotalPayAmount(int EncID)
+    {
+        var tsql = @" SELECT ISNULL(SUM(PayAmount),0) AS TotalPayAmount
+                            FROM dbo.Page p
+                            WHERE P.EncID=@EncID ";
+
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@EncID", EncID);
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableByText(CSet.cnStringHIS, com, tsql);
+
+        return Convert.ToInt32(dt.Rows[0]["TotalPayAmount"]);
+    }
+
+
+    public int EncIdLast(int ModID)
+    {
+        var encIDLast = 0;
+
+        var tsql = "SELECT ISNULL(MAX(EncID),0) AS EncID FROM Enc WHERE ModID=@ModID";
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@ModID", ModID);
+
+        var dalData = new DataService();
+
+        var dt = dalData.GetDataTableByText(CSet.cnStringHIS, com, tsql);
+        if (dt.Rows.Count > 0)
+            encIDLast = Convert.ToInt32(dt.Rows[0]["EncID"]);
+
+        return encIDLast;
+    }
+
+    public EncError EncError(Models.Enc enc, int FuncType)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@CRUD", enc.CRUD);
+        com.Parameters.AddWithValue("@FuncType", FuncType);
+        com.Parameters.AddWithValue("@NationalCode", enc.NationalCode);
+        com.Parameters.AddWithValue("@PatientID", enc.PatientID);
+        com.Parameters.AddWithValue("@FirstName", enc.FirstName);
+        com.Parameters.AddWithValue("@LastName", enc.LastName);
+        com.Parameters.AddWithValue("@FatherName", enc.FatherName);
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableBySP(CSet.cnStringHIS, com, "spPatient");
+
+        DataRow dRow = null;
+        if (dt.Rows.Count > 0)
+            dRow = dt.Rows[0];
+
+        return _appConvertDRowToModel.CreateItemFromRow<EncError>(dRow);
+    }
+
+    public List<Models.Enc> EncList(Models.Enc enc)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@CRUD", 1);
+        com.Parameters.AddWithValue("@FuncType", enc.FuncType);
+
+        com.Parameters.AddWithValue("@NationalCode", enc.NationalCode);
+        com.Parameters.AddWithValue("@FirstName", enc.FirstName);
+        com.Parameters.AddWithValue("@LastName", enc.LastName);
+        com.Parameters.AddWithValue("@FatherName", enc.FatherName);
+        com.Parameters.AddWithValue("@EncID", enc.EncID);
+        com.Parameters.AddWithValue("@PatientID", enc.PatientID);
+        com.Parameters.AddWithValue("@StartDate", enc.StartDate);
+        com.Parameters.AddWithValue("@StartDate1", enc.StartDate1);
+        com.Parameters.AddWithValue("@StartDateRange", enc.StartDateRange);
+        com.Parameters.AddWithValue("@EndDate", enc.EndDate);
+        com.Parameters.AddWithValue("@EndDate1", enc.EndDate1);
+        com.Parameters.AddWithValue("@EndDateRange", enc.EndDateRange);
+        com.Parameters.AddWithValue("@EncType", enc.EncType);
+        com.Parameters.AddWithValue("@IsEmerg", enc.IsEmerg);
+        com.Parameters.AddWithValue("@ModID", enc.ModID);
+        com.Parameters.AddWithValue("@DepID", enc.DepID);
+        com.Parameters.AddWithValue("@DrID", enc.DrID);
+        com.Parameters.AddWithValue("@RefDrID", enc.RefDrID);
+        com.Parameters.AddWithValue("@ReferDrText", enc.ReferDrText);
+        com.Parameters.AddWithValue("@PresDate", enc.PresDate == null ? DBNull.Value : enc.PresDate);
+        com.Parameters.AddWithValue("@EncService", enc.EncService);
+        com.Parameters.AddWithValue("@DiscountPercent", enc.DiscountPercent);
+        com.Parameters.AddWithValue("@ChiefComplaint", enc.ChiefComplaint);
+        com.Parameters.AddWithValue("@UnderlyingDisease", enc.UnderlyingDisease);
+        com.Parameters.AddWithValue("@Description", enc.Description);
+        com.Parameters.AddWithValue("@Insurance", enc.Insurance);
+        com.Parameters.AddWithValue("@InsuranceNumber", enc.InsuranceNumber);
+        com.Parameters.AddWithValue("@InsuranceSerial", enc.InsuranceSerial);
+        com.Parameters.AddWithValue("@InsurancePagenumber", enc.InsurancePageNumber);
+        com.Parameters.AddWithValue("@InsuranceExpireDate", enc.InsuranceExpireDate);
+        com.Parameters.AddWithValue("@InsuranceExpireValid", enc.InsuranceExpireValid);
+        com.Parameters.AddWithValue("@SDrFixAmount", enc.SDrFixAmount);
+        com.Parameters.AddWithValue("@IsSDrAcceptAmount", enc.IsSDrAcceptAmount);
+        com.Parameters.AddWithValue("@OprReserveDate",
+            enc.OprReserveDate == null ? DBNull.Value : enc.OprReserveDate);
+        com.Parameters.AddWithValue("@Height", enc.Height);
+        com.Parameters.AddWithValue("@Weight", enc.Weight);
+
+        com.Parameters.AddWithValue("@Mobile", enc.Mobile);
+        com.Parameters.AddWithValue("@City", enc.City);
+        com.Parameters.AddWithValue("@Street", enc.Street);
+        com.Parameters.AddWithValue("@Email", enc.Email);
+        com.Parameters.AddWithValue("@Tel", enc.Tel);
+
+        com.Parameters.AddWithValue("@CompanionFullName", enc.CompanionFullName);
+        com.Parameters.AddWithValue("@CompanionTel", enc.CompanionTel);
+        com.Parameters.AddWithValue("@Recommender", enc.Recommender);
+        com.Parameters.AddWithValue("@CompanionAddress", enc.CompanionAddress);
+
+        com.Parameters.AddWithValue("@Insurance2", enc.Insurance2);
+        com.Parameters.AddWithValue("@InsuranceNumber2", enc.InsuranceNumber2);
+
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableBySP(CSet.cnStringHIS, com, "spEnc");
+        return _appConvertDtToList.ConvertDataTable<Models.Enc>(dt);
+    }
+
+
+    public DataTable GetEncFinancialData(int EncID)
+    {
+        var tsql = @"
+                        SELECT ISNULL(SUM(PayAmount),0) AS TotalPayAmount, ISNULL(SUM(DiscountAmount),0) AS TotalDiscountAmount, 0 AS PageDrugCount
+                        FROM dbo.Page p
+                        WHERE EncID=@EncID
+
+                        UNION ALL
+
+                        SELECT PayAmount,DiscountAmount, 0 AS PageDrugCount
+                        FROM EncBillsummary
+                        WHERE EncID=@EncID
+
+
+                        UNION
+
+                        SELECT 0 AS PayAmount,0 AS DiscountAmount, COUNT(p.PageID) AS PageDrugCount
+                        FROM dbo.Page p
+                        INNER JOIN dbo.ServiceReg sr ON sr.PageID=p.PageID
+                        INNER JOIN dbo.Service s ON s.ServiceID=sr.ServiceID
+
+                        WHERE EncId=@EncID 
+                        AND ( (p.ModID IN (5,28) AND p.TotalAmount>0) OR s.ServiceType=2)
+
+                        ";
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@EncID", EncID);
+
+
+        var dalData = new DataService();
+        return dalData.GetDataTableByText(CSet.cnStringHIS, com, tsql);
+    }
+
+    public void EncCancelSave(bool IsCancel, int EncID, int PersID)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@IsCancel", IsCancel);
+        com.Parameters.AddWithValue("@EncID", EncID);
+        com.Parameters.AddWithValue("@PersID", PersID);
+
+        var dalData = new DataService();
+        dalData.GetDataTableBySP(CSet.cnStringHIS, com, "spEncCancel");
+    }
+
+    public Models.Enc EncSearch(Models.Enc enc, bool IsContactDisplay)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@EncID", enc.EncID);
+        com.Parameters.AddWithValue("@IsContactDisplay", IsContactDisplay);
+
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableBySP(CSet.cnStringHIS, com, "spEncSearch");
+
+        DataRow dRow = null;
+        if (dt.Rows.Count > 0)
+            dRow = dt.Rows[0];
+
+        return _appConvertDRowToModel.CreateItemFromRow<Models.Enc>(dRow);
+    }
+}
