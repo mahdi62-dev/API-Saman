@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using APP;
 using DAL;
 using Microsoft.Data.SqlClient;
@@ -45,12 +45,43 @@ public class Oper
         return oper;
     }
 
+    public Models.Oper GetOperInfoModelByID(int operID)
+    {
+        var oper = new Models.Oper();
+        if (operID <= 0) return oper;
+
+        var strTSQL = @"
+                            SELECT *
+                            FROM dbo.vSACResuInfo
+                            WHERE ResuID=@OperID
+                           ";
+
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@OperID", operID);
+
+        var dalData = new DataService();
+        var dRow = dalData.GetDataTableByText(CSet.cnStringHIS, com, strTSQL).Rows;
+
+        if (dRow.Count > 0)
+        {
+            oper.OperID = Convert.ToInt32(dRow[0]["ResuID"]);
+            oper.OperName = dRow[0]["ResuName"].ToString();
+            oper.OperPersID = Convert.ToInt32(dRow[0]["PersID"]);
+            oper.OperPersName = dRow[0]["PersName"].ToString();
+            oper.OperIsDisable = Convert.ToBoolean(dRow[0]["IsDisable"]);
+        }
+
+        return oper;
+    }
+
     public DataTable GetSACUserPermission(int UserID)
     {
         var strTSQL = @"
-                            SELECT *
-                            FROM dbo.vSACUserPermission
-                            WHERE UserID=@UserID
+                            SELECT up.UserID, up.ModID, up.ActionID,
+                                   p.ActionName, p.ActionNameEn, p.ParentID
+                            FROM dbo.vSACUserPermission up
+                            LEFT JOIN dbo.SACPermission p ON p.ActionID = up.ActionID
+                            WHERE up.UserID=@UserID
                            ";
 
         var com = new SqlCommand();

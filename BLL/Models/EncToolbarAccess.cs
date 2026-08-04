@@ -1,0 +1,3 @@
+namespace BLL.Models;
+public class EncToolbarAccess { public int CRUD { get; set; } = 1; public int EncToolbarAccessID { get; set; } public int ModID { get; set; } public int DepID { get; set; } public string ActionNameEn { get; set; } = ""; public string Caption { get; set; } = ""; public bool IsVisible { get; set; } = true; public bool IsDisable { get; set; } public int CenterID { get; set; } = 1; public int UserPersID { get; set; } public string ActionDate { get; set; } = ""; }
+public class EncToolbarCatalogItem { public string ActionNameEn { get; set; } = ""; public string Caption { get; set; } = ""; public string IconCssClass { get; set; } = ""; public int SortID { get; set; } public bool IsVisible { get; set; } = true; }

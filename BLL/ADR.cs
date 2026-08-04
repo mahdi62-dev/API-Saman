@@ -67,6 +67,24 @@ public class ADR
         return AdList;
     }
 
+
+    public List<Models.ADR> GetAdrListHIS(string ADName)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@ADName", ADName ?? string.Empty);
+
+        const string tsql = @"
+SELECT *
+FROM dbo.vADR
+WHERE ADName = @ADName
+  AND ISNULL(isDisable, 0) = 0
+ORDER BY SortID, ID";
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableByText(CSet.cnStringHIS, com, tsql);
+        return _appConvertDtToList.ConvertDataTable<Models.ADR>(dt);
+    }
+
     public List<Models.ADR> GetAdrListSP(string ADName)
     {
         var com = new SqlCommand();

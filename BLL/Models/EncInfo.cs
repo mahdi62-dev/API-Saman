@@ -26,6 +26,8 @@ public class EncInfo
     public bool IsDisplayMonitor { get; set; } // bit, not null
     public string WeekDayName { get; set; } // bit, not null
     public string ServiceName { get; set; } // bit, not null
+    public string Note { get; set; } = string.Empty;
+    public int SortID { get; set; }
 }
 
 public class TvSubtitle

@@ -116,6 +116,42 @@ public class Page
         return _appConvertDRowToModel.CreateItemFromRow<Models.Page>(dRow);
     }
 
+
+
+    public void PageUnlock(int pageID, int userPersID)
+    {
+        if (pageID <= 0) return;
+
+        var tsql = @"
+            UPDATE dbo.Page
+               SET IsReadOnly = 0,
+                   UserPersID = CASE WHEN @UserPersID > 0 THEN @UserPersID ELSE UserPersID END
+             WHERE PageID = @PageID";
+
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@PageID", pageID);
+        com.Parameters.AddWithValue("@UserPersID", userPersID);
+        new DataService().ExecuteNonQueryByText(CSet.cnStringHIS, com, tsql);
+    }
+
+
+
+    public void PageLock(int pageID, int userPersID)
+    {
+        if (pageID <= 0) return;
+
+        var tsql = @"
+            UPDATE dbo.Page
+               SET IsReadOnly = 1,
+                   UserPersID = CASE WHEN @UserPersID > 0 THEN @UserPersID ELSE UserPersID END
+             WHERE PageID = @PageID";
+
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@PageID", pageID);
+        com.Parameters.AddWithValue("@UserPersID", userPersID);
+        new DataService().ExecuteNonQueryByText(CSet.cnStringHIS, com, tsql);
+    }
+
     public DataTable PageAmountSave
         (int PageID)
     {

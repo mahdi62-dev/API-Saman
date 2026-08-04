@@ -38,6 +38,17 @@ public class DataService
         com.ExecuteNonQuery();
     }
 
+    public void ExecuteNonQueryByText(string cnString, SqlCommand com, string comText)
+    {
+        using var con = new SqlConnection(cnString);
+        com.Connection = con;
+        com.CommandType = CommandType.Text;
+        com.CommandText = comText;
+
+        con.Open();
+        com.ExecuteNonQuery();
+    }
+
     // ───── Text SQL ─────
 
     public DataTable GetDataTableByText(string cnString, SqlCommand com, string comText)

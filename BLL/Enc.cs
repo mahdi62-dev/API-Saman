@@ -35,17 +35,17 @@ public class Enc
         com.Parameters.AddWithValue("@LastName", enc.LastName);
         com.Parameters.AddWithValue("@FatherName", enc.FatherName);
 
-        com.Parameters.AddWithValue("@Gender", enc.Gender);
+        com.Parameters.AddWithValue("@Gender", SafeNonNegative(enc.Gender));
         com.Parameters.AddWithValue("@BirthDate", enc.BirthDate);
-        com.Parameters.AddWithValue("@MaritalStatus", enc.MaritalStatus);
-        com.Parameters.AddWithValue("@Country", enc.Country);
+        com.Parameters.AddWithValue("@MaritalStatus", SafeNonNegative(enc.MaritalStatus));
+        com.Parameters.AddWithValue("@Country", SafeNonNegative(enc.Country));
 
         com.Parameters.AddWithValue("@IDCardNumber", enc.IDCardNumber);
-        com.Parameters.AddWithValue("@BirthArea", enc.BirthArea);
-        com.Parameters.AddWithValue("@Religion", enc.Religion);
-        com.Parameters.AddWithValue("@Job", enc.Job);
+        com.Parameters.AddWithValue("@BirthArea", SafeNonNegative(enc.BirthArea));
+        com.Parameters.AddWithValue("@Religion", SafeNonNegative(enc.Religion));
+        com.Parameters.AddWithValue("@Job", SafeNonNegative(enc.Job));
         com.Parameters.AddWithValue("@PassportID", enc.PassportID);
-        com.Parameters.AddWithValue("@EducationLevel", enc.EducationLevel);
+        com.Parameters.AddWithValue("@EducationLevel", SafeNonNegative(enc.EducationLevel));
 
         com.Parameters.AddWithValue("@UserPersID", UserPersID);
 
@@ -129,6 +129,138 @@ public class Enc
     public Models.Enc EncCRUD(Models.Enc enc)
     {
         return EncCRUD(enc, 0);
+    }
+
+
+    public Models.Enc EncLoadByID(int encID)
+    {
+        if (encID <= 0) return new Models.Enc();
+
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@EncID", encID);
+
+        const string tsql = @"
+SELECT TOP 1 *
+FROM dbo.vEncFullName e
+WHERE e.EncID = @EncID
+  AND ISNULL(e.IsCancel, 0) = 0;";
+
+        var dt = new DataService().GetDataTableByText(CSet.cnStringHIS, com, tsql);
+        DataRow dRow = null;
+        if (dt.Rows.Count > 0)
+            dRow = dt.Rows[0];
+
+        return _appConvertDRowToModel.CreateItemFromRow<Models.Enc>(dRow);
+    }
+
+    public Models.Enc EncNavigateByType(int encID, int funcType, int encType)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@EncID", encID);
+        com.Parameters.AddWithValue("@FuncType", funcType);
+        com.Parameters.AddWithValue("@EncType", encType);
+
+        const string tsql = @"
+DECLARE @EncIDCur INT = ISNULL(@EncID, 0);
+
+IF @FuncType = 100 -- Last
+BEGIN
+    SELECT @EncIDCur = ISNULL(MAX(EncID), 0)
+    FROM dbo.Enc
+    WHERE EncType = @EncType
+      AND ISNULL(IsCancel, 0) = 0;
+END
+ELSE IF @FuncType = 101 -- Next
+BEGIN
+    SELECT TOP 1 @EncIDCur = EncID
+    FROM dbo.Enc
+    WHERE EncType = @EncType
+      AND ISNULL(IsCancel, 0) = 0
+      AND EncID > @EncID
+    ORDER BY EncID;
+
+    IF ISNULL(@EncIDCur, 0) = ISNULL(@EncID, 0)
+        SELECT @EncIDCur = ISNULL(MAX(EncID), 0) FROM dbo.Enc WHERE EncType = @EncType AND ISNULL(IsCancel, 0) = 0;
+END
+ELSE IF @FuncType = 102 -- Previous
+BEGIN
+    SELECT TOP 1 @EncIDCur = EncID
+    FROM dbo.Enc
+    WHERE EncType = @EncType
+      AND ISNULL(IsCancel, 0) = 0
+      AND EncID < @EncID
+    ORDER BY EncID DESC;
+
+    IF ISNULL(@EncIDCur, 0) = ISNULL(@EncID, 0)
+        SELECT @EncIDCur = ISNULL(MIN(EncID), 0) FROM dbo.Enc WHERE EncType = @EncType AND ISNULL(IsCancel, 0) = 0;
+END
+
+SELECT TOP 1 *
+FROM dbo.vEncFullName e
+WHERE e.EncID = @EncIDCur
+  AND e.EncType = @EncType;
+";
+
+        var dt = new DataService().GetDataTableByText(CSet.cnStringHIS, com, tsql);
+        DataRow dRow = null;
+        if (dt.Rows.Count > 0)
+            dRow = dt.Rows[0];
+
+        var result = _appConvertDRowToModel.CreateItemFromRow<Models.Enc>(dRow);
+        if (result.EncID == 0)
+            result.EncType = encType;
+        return result;
+    }
+
+    public DataTable ActiveInpatientByNationalCode(string nationalCode, int excludeEncID = 0)
+        => ActiveInpatientByPatientOrNational(0, nationalCode, excludeEncID);
+
+    public DataTable ActiveInpatientByPatientOrNational(int patientID, string nationalCode, int excludeEncID = 0)
+    {
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@PatientID", patientID);
+        com.Parameters.AddWithValue("@NationalCode", nationalCode ?? "");
+        com.Parameters.AddWithValue("@ExcludeEncID", excludeEncID);
+
+        const string tsql = @"
+DECLARE @NC NCHAR(10) = NULLIF(LTRIM(RTRIM(@NationalCode)), N'');
+
+SELECT TOP 1
+    e.EncID,
+    e.PatientID,
+    p.FirstName,
+    p.LastName,
+    p.FatherName,
+    p.NationalCode,
+    e.StartDate,
+    e.EncStatus,
+    ISNULL(es.Name, N'') AS EncStatusName,
+    ISNULL(ei.WardID, 0) AS WardID,
+    ISNULL(w.WardName, N'') AS WardName,
+    ISNULL(ei.RoomID, 0) AS RoomID,
+    ISNULL(r.RoomName, r.RoomNo) AS RoomName,
+    ISNULL(ei.BedID, 0) AS BedID,
+    ISNULL(b.BedNo, N'') AS BedNo,
+    ISNULL(b.BedName, N'') AS BedName
+FROM dbo.EncInpatient ei
+INNER JOIN dbo.Enc e ON e.EncID = ei.EncID
+INNER JOIN dbo.Patient p ON p.PatientID = e.PatientID
+LEFT JOIN dbo.InpBed b ON b.BedID = ei.BedID
+LEFT JOIN dbo.InpRoom r ON r.RoomID = ISNULL(NULLIF(ei.RoomID, 0), b.RoomID)
+LEFT JOIN dbo.InpWard w ON w.WardID = ISNULL(NULLIF(ei.WardID, 0), ISNULL(r.WardID, b.WardID))
+LEFT JOIN dbo.vADR es ON es.ADName = N'EncStatus' AND es.ID = e.EncStatus
+WHERE ISNULL(e.IsCancel, 0) = 0
+  -- ملاک فعال بودن بستری، داشتن EncInpatient و ترخیص/کنسل نهایی نشدن است؛
+  -- برای داده‌های قدیمی فقط به EncType تکیه نمی‌کنیم.
+  AND ISNULL(e.EncStatus, 0) NOT IN (4, 5, 27, 28)
+  AND e.EncID <> @ExcludeEncID
+  AND (
+        (@PatientID > 0 AND e.PatientID = @PatientID)
+        OR (@NC IS NOT NULL AND LTRIM(RTRIM(p.NationalCode)) = @NC)
+      )
+ORDER BY e.EncID DESC";
+
+        return new DataService().GetDataTableByText(CSet.cnStringHIS, com, tsql);
     }
 
     public DataTable EncInsuranceChange
@@ -322,4 +454,7 @@ public class Enc
 
         return _appConvertDRowToModel.CreateItemFromRow<Models.Enc>(dRow);
     }
+
+    private static int SafeNonNegative(int value) => value < 0 ? 0 : value;
+
 }

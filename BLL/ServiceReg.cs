@@ -54,6 +54,23 @@ public class ServiceReg
         dalData.ExecuteNonQueryBySp(CSet.cnStringHIS, com, "spServiceReg");
     }
 
+
+
+    public void UpdateServiceRegStaff(int srid, int drID, int persID)
+    {
+        if (srid <= 0) return;
+        const string tsql = @"
+            UPDATE dbo.ServiceReg
+               SET DrID = @DrID,
+                   PersID = @PersID
+             WHERE SRID = @SRID";
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@SRID", srid);
+        com.Parameters.AddWithValue("@DrID", drID);
+        com.Parameters.AddWithValue("@PersID", persID);
+        new DataService().ExecuteNonQueryByText(CSet.cnStringHIS, com, tsql);
+    }
+
     public DataTable DrReportListSearch(int PageID)
     {
         var tsql =

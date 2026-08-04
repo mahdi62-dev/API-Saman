@@ -28,6 +28,38 @@ public class Personnel
         return PersList;
     }
 
+
+    public Models.Personnel GetPersByNationalCode(string nationalCode, int currentPersID = 0)
+    {
+        if (string.IsNullOrWhiteSpace(nationalCode))
+            return new Models.Personnel();
+
+        var strTSQL = @"
+SELECT TOP 1 PersID
+FROM dbo.Personnel
+WHERE NationalCode = @NationalCode
+  AND (@CurrentPersID = 0 OR PersID <> @CurrentPersID)
+ORDER BY PersID";
+
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@NationalCode", nationalCode);
+        com.Parameters.AddWithValue("@CurrentPersID", currentPersID);
+
+        var dalData = new DataService();
+        var dt = dalData.GetDataTableByText(CSet.cnStringERP, com, strTSQL);
+
+        if (dt.Rows.Count == 0)
+            return new Models.Personnel();
+
+        var pers = new Models.Personnel
+        {
+            CRUD = 1,
+            PersID = Convert.ToInt32(dt.Rows[0]["PersID"])
+        };
+
+        return PersCRUD(pers);
+    }
+
     public Models.Personnel PersCRUD(Models.Personnel pers)
     {
         var com = new SqlCommand();
