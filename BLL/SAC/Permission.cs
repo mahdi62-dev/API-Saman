@@ -1,3 +1,4 @@
+﻿using System.Data;
 using APP;
 using DAL;
 using Microsoft.Data.SqlClient;
@@ -186,6 +187,40 @@ COMMIT TRAN;";
 
         var dalData = new DataService();
         dalData.ExecuteNonQueryByText(CSet.cnStringHIS, com, tsql);
+    }
+
+
+
+    public HashSet<int> GetAllowedDepIDs(int resuID, string accessType)
+    {
+        var result = new HashSet<int>();
+        if (resuID <= 0 || string.IsNullOrWhiteSpace(accessType)) return result;
+
+        var prefix = accessType.Equals("Enc", StringComparison.OrdinalIgnoreCase)
+            ? "DepAccess.Enc."
+            : "DepAccess.Page.";
+
+        const string tsql = @"
+SELECT p.ActionNameEn
+FROM dbo.SACUserPermission up
+INNER JOIN dbo.SACPermission p ON p.ActionID = up.ActionID
+WHERE up.UserID = @ResuID
+  AND p.ActionNameEn LIKE @Prefix + N'%'";
+
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@ResuID", resuID);
+        com.Parameters.AddWithValue("@Prefix", prefix);
+
+        var dt = new DataService().GetDataTableByText(CSet.cnStringHIS, com, tsql);
+        foreach (DataRow row in dt.Rows)
+        {
+            var key = row["ActionNameEn"]?.ToString() ?? string.Empty;
+            var idx = key.LastIndexOf('.');
+            if (idx >= 0 && int.TryParse(key[(idx + 1)..], out var depID) && depID > 0)
+                result.Add(depID);
+        }
+
+        return result;
     }
 
     public void SavePermission(int actionID, int resuID, int modID, bool permission, int userPersID)
