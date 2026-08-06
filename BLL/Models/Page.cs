@@ -90,6 +90,7 @@ public class Page
     public byte InvOutputApplyStatus { get; set; } // tinyint, not null
 
     [Description("برگه بسته شده")] public bool IsReadOnly { get; set; } // bit, not null
+    [Description("برگه توسط کاربر مجاز برای ویرایش باز شده")] public bool UnlockForEdit { get; set; } = false;
     [Description("شناسه حواله خروج")] public int InvPageID { get; set; } // int, not null
     [Description("مبلغ بیمه تکمیلی")] public int InsuranceAmount2 { get; set; } // int, not null
     [Description("مسئول فنی")] public int DrTechAssist { get; set; } // int, not null

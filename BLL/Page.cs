@@ -125,6 +125,7 @@ public class Page
         var tsql = @"
             UPDATE dbo.Page
                SET IsReadOnly = 0,
+                   UnlockForEdit = 1,
                    UserPersID = CASE WHEN @UserPersID > 0 THEN @UserPersID ELSE UserPersID END
              WHERE PageID = @PageID";
 
@@ -143,6 +144,7 @@ public class Page
         var tsql = @"
             UPDATE dbo.Page
                SET IsReadOnly = 1,
+                   UnlockForEdit = 0,
                    UserPersID = CASE WHEN @UserPersID > 0 THEN @UserPersID ELSE UserPersID END
              WHERE PageID = @PageID";
 
