@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Saman warning management for Release publish: فقط خروجی Build/Publish را خلوت می‌کند و رفتار برنامه را تغییر نمی‌دهد. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS0642;CS0169;CS0414;CS4014;CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625;CS8629;CS0618;CA1416</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
     <PackageReference Include="IPE.SmsIr" Version="1.2.7" />
@@ -13,7 +18,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="8.0.28" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
     <!-- Stimulsoft 2023.x با ImageSharp 3.x خطای TiffEncoder.set_Compression می‌دهد؛ نسخه 2.1.4 با API مورد انتظار سازگار است. -->
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.4" />
     <PackageReference Include="Stimulsoft.Reports.Blazor" Version="2023.1.1" />
     <PackageReference Include="Stimulsoft.Reports.Engine.Blazor" Version="2023.1.1" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.9" />

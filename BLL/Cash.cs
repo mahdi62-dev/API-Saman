@@ -62,6 +62,47 @@ public class Cash
         return dt;
     }
 
+
+
+    public void CashPageReceiptUpdate(Models.Cash cash, int userPersID)
+    {
+        if (cash == null || cash.CashID <= 0) return;
+
+        const string tsql = @"
+            DECLARE @Now NCHAR(16);
+            SELECT @Now = SamanHIS.dbo.SCurdatetime();
+
+            UPDATE dbo.Cash
+               SET CashDate = CASE WHEN @CashDate IS NULL OR LTRIM(RTRIM(@CashDate)) = N'' THEN CashDate ELSE @CashDate END,
+                   PayType = @PayType,
+                   PayGroup = @PayGroup,
+                   Bank = @Bank,
+                   PayAmount = @PayAmount,
+                   Note = @Note,
+                   BankNumber = @BankNumber,
+                   BankDate = @BankDate,
+                   UserPersID = CASE WHEN @UserPersID > 0 THEN @UserPersID ELSE UserPersID END,
+                   ActionDate = @Now
+             WHERE CashID = @CashID;
+
+            IF @PageID > 0
+                EXEC dbo.spPageAmountSave @PageID = @PageID, @IsCash = 1;";
+
+        var com = new SqlCommand();
+        com.Parameters.AddWithValue("@CashID", cash.CashID);
+        com.Parameters.AddWithValue("@PageID", cash.PageID);
+        com.Parameters.AddWithValue("@CashDate", (object?)cash.CashDate ?? DBNull.Value);
+        com.Parameters.AddWithValue("@PayType", cash.PayType);
+        com.Parameters.AddWithValue("@PayGroup", cash.PayGroup);
+        com.Parameters.AddWithValue("@Bank", cash.Bank ?? 0);
+        com.Parameters.AddWithValue("@PayAmount", cash.PayAmount);
+        com.Parameters.AddWithValue("@Note", (object?)cash.Note ?? DBNull.Value);
+        com.Parameters.AddWithValue("@BankNumber", (object?)cash.BankNumber ?? DBNull.Value);
+        com.Parameters.AddWithValue("@BankDate", (object?)cash.BankDate ?? DBNull.Value);
+        com.Parameters.AddWithValue("@UserPersID", userPersID);
+        new DataService().ExecuteNonQueryByText(CSet.cnStringHIS, com, tsql);
+    }
+
     public List<Models.Cash> CashListCRUD(Models.Cash cash)
     {
         var com = new SqlCommand();
